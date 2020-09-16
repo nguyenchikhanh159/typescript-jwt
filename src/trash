@@ -1,0 +1,88 @@
+   Users.findOne({ username: req.body.username }, (err, data) => {
+            if (err) {
+                return next(err);
+            }
+            if (data) {
+                return res.redirect('/signup');
+            }
+            user.save((err) => {
+                if (err)
+                    return next(err);
+                console.log("Register Successful");
+            })
+        })
+        / UserSchema.methods.comparePassword = function (_requestPassword, _cb): any {
+//   bcrypt.compare(_requestPassword, this.password, (err, isMatch) => {
+//     return _cb(err, isMatch);
+//   })
+// }
+// user.comparePassword(_password, (err:Error, isMatch:any) => {
+//   if (err)
+//       return res.json({
+//           error: err
+//       })
+//   if (!isMatch) {
+//       return res.json({
+//           error: ['Password does not match']
+//       })
+//   }
+//   const token = jwt.sign(
+//       {
+//           username: user.username,
+//           password: user.password
+//       },
+//     'UIT',
+//   )
+//   user.tokens = undefined;
+//   user.password = undefined;
+//   return res.status(200).json({
+//       user,
+//       token,
+
+//   })
+
+// }
+  await Users.findOne({ username: _username }, (err, user) => {
+            if (err) {
+                return res.json(err);
+            }
+            if (!user) {
+                return res.json({
+                    error: ['User not found']
+                })
+            }
+            if (!user.password) {
+                return res.json({
+                    error: ['Please login using your social creds']
+
+                })
+            }
+            user.comparePassword(_password, (err:Error, isMatch:any) => {
+                if (err)
+                    return res.json({
+                        error: err
+                    })
+                if (!isMatch) {
+                    return res.json({
+                        error: ['Password does not match']
+                    })
+                }
+                const token = jwt.sign(
+                    {
+                        username: user.username,
+                        password: user.password
+                    },
+                  'UIT',
+                )
+                user.tokens = undefined;
+                user.password = undefined;
+                return res.status(200).json({
+                    user,
+                    token,
+
+                })
+
+            })
+
+
+        })
